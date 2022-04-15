@@ -1,6 +1,4 @@
-A template for your project README.
-
-## metrics-exporter-statsd
+# metrics-exporter-statsd
 
 A [metrics-rs](https://github.com/metrics-rs/metrics/) exporter that supports reporting metrics to StatsD. This exporter is basically a thin wrapper on top of the [`cadence`] crate which supports Statsd/Datadog style metrics.
 
