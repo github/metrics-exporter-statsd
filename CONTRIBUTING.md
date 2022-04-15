@@ -31,7 +31,7 @@ Here are a few things you can do that will increase the likelihood of your pull 
 Make sure you have [rust toolchain installed](https://www.rust-lang.org/tools/install) on your system and then:
 
 ```sh 
-    cargo build && cargo test
+cargo build && cargo test
 ```
 
 Run clippy and fix any lints:
