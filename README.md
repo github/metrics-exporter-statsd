@@ -8,10 +8,6 @@ Check out [crates.io](https://crates.io/crates/metrics-exporter-statsd) document
 
 This project welcomes contributions. See CONTRIBUTING.md for details on how to build, install, and contribute.
 
-```
-cargo build test
-
-```
 ## License 
 
 This project is licensed under the terms of the MIT open source license. Please refer to [LICENSE.md](./LICENSE.md) for the full terms.
