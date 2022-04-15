@@ -49,7 +49,7 @@ cargo clippy --tests -- --deny warnings -A clippy::unwrap_used
     
 ## Secrets and authentication for publishing
 
-Repository administrators, will need to manage the authentication keys for publishing to crates.io. 
+Repository administrators will need to manage the authentication keys for publishing to crates.io.
 
 TODO:Update this secion with how to update crates.io secrets within this repo
 
