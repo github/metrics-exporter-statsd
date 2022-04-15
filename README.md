@@ -14,7 +14,7 @@ cargo build test
 ```
 ## License 
 
-This project is licensed under the terms of the MIT open source license. Please refer to [MIT](./LICENSE.md) for the full terms.
+This project is licensed under the terms of the MIT open source license. Please refer to [LICENSE.md](./LICENSE.md) for the full terms.
 
 ## Acknowledgement
 
