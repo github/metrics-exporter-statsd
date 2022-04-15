@@ -36,10 +36,9 @@ cargo build && cargo test
 
 Run clippy and fix any lints:
 ```sh
- 	cargo fmt --all -- --check
-	cargo clippy -- --deny warnings -D clippy::unwrap_used
-	cargo clippy --tests -- --deny warnings -A clippy::unwrap_used
-
+cargo fmt --all -- --check
+cargo clippy -- --deny warnings -D clippy::unwrap_used
+cargo clippy --tests -- --deny warnings -A clippy::unwrap_used
 ## Releasing (write access required)
 
 1. Double-check the `CHANGELOG.md` contains all desired change comments and has the version to be released with date at the top.
