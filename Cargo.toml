@@ -1,0 +1,10 @@
+[package]
+name = "metrics-exporter-statsd"
+version = "0.1.0"
+authors = ["Manish Bellani <mbellani@github.com>"]
+edition = "2021"
+
+[dependencies]
+cadence = "0.29"
+metrics = "0.18"
+thiserror = "1.0"
