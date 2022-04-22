@@ -44,7 +44,7 @@ cargo clippy --tests -- --deny warnings -A clippy::unwrap_used
 
 ## Releasing (write access required)
 
-If you are one of the maintainers of this package then follow this process
+If you are one of the maintainers of this package then follow this process:
 
 1. Double-check the `CHANGELOG.md` contains all desired change comments and has the version to be released with date at the top.
     * Go through all recent PRs and make sure they are properly accounted for.
