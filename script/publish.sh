@@ -74,9 +74,14 @@ if [[ "${PKG_VERSION}" != "${VERSION}" ]]; then
     exit
 fi
 
-git tag $VERSION
 cargo package 
-CMD="cargo publish ${MODE} --token ${TOKEN}"
-echo "$CMD"
-eval $CMD
-git push origin $VERSION
+
+if [[ "${MODE}" == "--dry-run" ]]; then
+    CMD="cargo publish --dry-run --token ${TOKEN}"
+else    
+    git tag $VERSION
+    CMD="cargo publish --token ${TOKEN}"
+    echo "$CMD"
+    eval $CMD
+    git push origin $VERSION   
+fi
