@@ -4,7 +4,7 @@
 #/ 
 #/ version: Version to publish to crates.io.
 #/ token: cates.io token to use for publishing.
-#/ upload: Actually publishes the the crate to crates.io, by default thisc script 
+#/ upload: Actually publishes the the crate to crates.io. By default this script 
 #/         runs cargo publish in dry-run mode
 
 set -euo pipefail
