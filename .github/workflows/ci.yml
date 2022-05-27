@@ -1,8 +1,8 @@
-      default: 'true' 
 name: CI
 
 on:
   push:
+  workflow_dispatch:
 
 env:
   CARGO_TERM_COLOR: always
@@ -18,3 +18,9 @@ jobs:
 
     - name: Run tests
       run: cargo test --verbose
+
+    - name: Lint
+      run: | 
+         cargo fmt --all -- --check
+         cargo clippy -- --deny warnings -D clippy::unwrap_used
+         cargo clippy --tests -- --deny warnings -A clippy::unwrap_used
