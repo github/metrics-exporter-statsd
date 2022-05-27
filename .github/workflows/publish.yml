@@ -1,0 +1,55 @@
+name: Publish Crate
+inputs:
+  version:
+    description: 'Version of the crate to publish'
+    required: True
+    dryRun:
+      description: 'Run all the steps but don't publish the package'
+      required: tPrue
+      type: boolean
+
+on:
+  workflow_dispatch:
+    branches:
+      - main # We only allow publishing crates from main
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Run tests
+      run: cargo test --verbose
+      
+    - name: Precheck
+        run: |
+          # Get the current version of the package
+          PKG_VERSION=cargo metadata --format-version 1 | jq  -r '.workspace_members[0]' | awk '{print $2}'
+          # Bail if the version doesn't match what's in cargo file
+          if [[ "${{ inputs.version }}" != "$PKG_VERSION" ]]
+            echo "Please make sure the Cargo.toml is updated with correct version"
+            exit 1
+          fi 
+
+    - name: Ceate and push tag
+        run: |
+          git tag ${{ inputs.version }}
+          git push origin ${{ inputs.version }}
+          echon "pushed ${{ inputs.version }} tag"
+
+    - name: Package
+      run: cargo package --verbose
+
+    # - name: Publish Dry Run
+    #   run: cargo publish  --verbose --token ${{ env.CRATES_IO_TOKEN }}
+    #   if:  ${{ github.event.inputs.dryRun == 'false' }}
+    #   env:
+    #     CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+
+    - name: Publish Dry Run
+      run: cargo publish --dry-run --verbose --token ${{ env.CRATES_IO_TOKEN }}
+      if:  ${{ github.event.inputs.dryRun == 'true' }}
+      env:
+        CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+    
