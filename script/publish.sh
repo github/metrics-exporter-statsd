@@ -32,10 +32,8 @@ then
   exit
 fi
 # Ensure that the tests are still passing before publishing
-# cargo test --verbose
+cargo test --verbose
 
-# parse args
-# extract options and their arguments into variables.
 while [ $# -gt 0 ]; do
   case "$1" in
     --help|-h)
