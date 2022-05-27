@@ -41,7 +41,7 @@ while [ $# -gt 0 ]; do
     --upload)
       MODE=; shift ;;
     --token)
-      TOKEN=$2=1; shift 2;;
+      TOKEN=$2; shift 2;;
     --version)
       VERSION=$2; shift 2 ;;
     --)
@@ -63,19 +63,18 @@ if [[ -z "${TOKEN}" ]]; then
     exit
 fi
 
-if [[ $(git rev-parse --abbrev-ref HEAD) != "main" ]] 
-then
-   echo "You can only publish from main branch"
-   exit
-fi
+# if [[ $(git rev-parse --abbrev-ref HEAD) != "main" ]] 
+# then
+#    echo "You can only publish from main branch"
+#    exit
+# fi
 
 if [[ "${PKG_VERSION}" != "${VERSION}" ]]; then
-    echo "Please make sure the version matches in the cargo file"
+    echo "Version mismatched, cargo file: ${PKG_VERSION}, You supplied: ${VERSION}"
     exit
 fi
 
 git tag $VERSION
 cargo package 
-cmd="cargo publish ${UPLOAD} --token ${TOKEN}"
-eval $CMD
+CMD="cargo publish ${MODE} --token ${TOKEN}"
 git push origin $VERSION
