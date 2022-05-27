@@ -46,11 +46,13 @@ cargo clippy --tests -- --deny warnings -A clippy::unwrap_used
 
 If you are one of the maintainers of this package then follow this process:
 
-1. Double-check the `CHANGELOG.md` contains all desired change comments and has the version to be released with date at the top.
-    * Go through all recent PRs and make sure they are properly accounted for.
-    * Make sure all changelog entries have links back to their PR(s) if appropriate.
-1. Create a PR for this release:
-    - TODO: fill out the release process
+1. Create a PR for this release with following changes:
+  - Updated `CHANGELOG.md` with desired change comments and ensure that it has the version to be released with date at the top.
+  - Go through all recent PRs and make sure they are properly accounted for.
+  - Make sure all changelog entries have links back to their PR(s) if appropriate.
+  - Update package version in Cargo.toml.
+1. Get an approval and merge your PR.
+1. Run ./script/publish from main `branch` supplying your token and version information.
     
 ## Secrets and authentication for publishing
 
