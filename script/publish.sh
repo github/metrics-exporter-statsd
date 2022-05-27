@@ -78,6 +78,7 @@ cargo package
 
 if [[ "${MODE}" == "--dry-run" ]]; then
     CMD="cargo publish --dry-run --token ${TOKEN}"
+    eval $CMD
 else    
     git tag $VERSION
     CMD="cargo publish --token ${TOKEN}"
