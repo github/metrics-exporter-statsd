@@ -3,7 +3,7 @@
 #/ Usage: script/publish --version <version> --token <token> [--dry-run]
 #/ 
 #/ version: Version to publish to crates.io.
-#/ token: cates.io token to use for publishing.
+#/ token: crates.io token to use for publishing.
 #/ upload: Actually publishes the the crate to crates.io. By default this script 
 #/         runs cargo publish in dry-run mode
 
