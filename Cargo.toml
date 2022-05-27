@@ -8,7 +8,7 @@ description = "metrics-rs exporter that supports reporting metrics to StatsD"
 readme = "README.md"
 repository = "https://github.com/github/metrics-exporter-statsd"
 homepage = "https://github.com/github/metrics-exporter-statsd"
-keywords = ["metrics", "statsd", "rust"]
+keywords = ["metrics", "statsd"]
 categories = ["observability", "operations"]
 
 [dependencies]
