@@ -3,10 +3,11 @@ inputs:
   version:
     description: 'Version of the crate to publish'
     required: True
-    dryRun:
-      description: 'Run all the steps but don't publish the package'
-      required: tPrue
-      type: boolean
+  dryRun:
+    description: 'Run all the steps but don't publish the package'
+    required: true
+    default: 'true' 
+    type: boolean
 
 on:
   workflow_dispatch:
@@ -15,7 +16,9 @@ on:
 
 jobs:
   publish:
+
     runs-on: ubuntu-latest
+
     steps:
     - uses: actions/checkout@v3
 
@@ -32,11 +35,11 @@ jobs:
             exit 1
           fi 
 
-    - name: Ceate and push tag
+    - name: Create and push tag
         run: |
           git tag ${{ inputs.version }}
           git push origin ${{ inputs.version }}
-          echon "pushed ${{ inputs.version }} tag"
+          echo "pushed ${{ inputs.version }} tag"
 
     - name: Package
       run: cargo package --verbose
