@@ -63,11 +63,11 @@ if [[ -z "${TOKEN}" ]]; then
     exit
 fi
 
-# if [[ $(git rev-parse --abbrev-ref HEAD) != "main" ]] 
-# then
-#    echo "You can only publish from main branch"
-#    exit
-# fi
+if [[ $(git rev-parse --abbrev-ref HEAD) != "main" ]] 
+then
+   echo "You can only publish from main branch"
+   exit
+fi
 
 if [[ "${PKG_VERSION}" != "${VERSION}" ]]; then
     echo "Version mismatched, cargo file: ${PKG_VERSION}, You supplied: ${VERSION}"
@@ -77,4 +77,6 @@ fi
 git tag $VERSION
 cargo package 
 CMD="cargo publish ${MODE} --token ${TOKEN}"
+echo "$CMD"
+eval $CMD
 git push origin $VERSION
