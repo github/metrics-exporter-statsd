@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 #/ Publishes metrics-exporter-statsd to crates.io
-#/ Usage: script/publish --version <version> --token <token> [--dry-run]
+#/ Usage: script/publish --version <version> --token <token> [--upload]
 #/ 
 #/ version: Version to publish to crates.io.
 #/ token: crates.io token to use for publishing.
