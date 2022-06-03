@@ -1,16 +1,20 @@
 //! A [`metrics`] exporter that supports reporting metrics to Statsd. This exporter is basically
 //! a thin wrapper on top of the [`cadence`] crate which supports Statsd/Datadog style metrics.
 //!
+//! **Versions of this crate are tightly coupled to metrics crate versions**
+//!
 //! # Usage
 //!
 //! ```
 //! use metrics_exporter_statsd::StatsdBuilder;
 //!
-//! StatsdBuilder::from("127.0.0.1", 8125)
+//! let recorder = StatsdBuilder::from("127.0.0.1", 8125)
 //! .with_queue_size(5000)
 //! .with_buffer_size(1024)
-//! .install(Some("prefix"))
-//! .unwrap_or_else(|err| println!("yikes could not configure statsd {:?}", err))
+//! .build(Some("prefix"))
+//! .expect("Could not create StatsdRecorder");
+//!
+//! metrics::set_boxed_recorder(Box::new(recorder));
 //! ```
 //!
 //! You can then continue to use [`metrics`] as usual:
@@ -93,12 +97,14 @@
 //! ```
 //! use metrics_exporter_statsd::StatsdBuilder;
 //!
-//! StatsdBuilder::from("127.0.0.1", 8125)
+//! let recorder = StatsdBuilder::from("127.0.0.1", 8125)
 //! .with_queue_size(5000)
 //! .with_buffer_size(1024)
 //! .histogram_is_distribution()
-//! .install(Some("prefix"))
-//! .unwrap_or_else(|err| println!("yikes could not configure statsd {:?}", err))
+//! .build(Some("prefix"))
+//! .expect("Could not create StatsdRecorder");
+//!
+//! metrics::set_boxed_recorder(Box::new(recorder));
 //!```
 //!
 //! Once the exporter is marked this way then all the histograms will be reported as distributions
@@ -110,7 +116,13 @@
 //! This will emit a metric like this: `metric.name:100|d|#tag:value`, note the metric type has
 //! emitted here is `d` and not `h`.
 //!
-
+//! **Note:** Most of the other metrics-rs builders provide a convenience method for installing a global recorder. E.g
+//! for Prometheus or TCP metrics exporters you could do something along the lines of `PrometheusBuilder::new().install()`.
+//!
+//! This library does not have an `.install()` method. Instead, use `.build()` and call
+//! `metrics::set_boxed_recorder`, as in the example code. This ensures that if you ever have a version mismatch
+//! between `metrics-recorder-statsd` and `metrics`, you'll get a build-time error (rather than Cargo silently
+//! linking in two versions of `metrics`, which would result in `metrics` silently dropping all your data).
 mod recorder;
 
 pub use self::recorder::*;

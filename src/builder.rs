@@ -124,27 +124,24 @@ impl StatsdBuilder {
         self
     }
 
-    /// This method is responsible building the StatsdRecorder and registering it with the metrics
-    /// system. It configures the underlying metrics sink for the [`StatsdClient`] with the values
-    /// provided e.g. `queue_size`, `buffer_size` etc.
+    /// This method is responsible building the StatsdRecorder. It configures the underlying metrics sink for
+    /// the [`StatsdClient`] with the values provided e.g. `queue_size`, `buffer_size` etc.
     ///
     /// All the metrics emitted from the recorder are prefixed with the prefix that's provided here.
     ///
     /// # Examples
     /// ```
     /// use metrics_exporter_statsd::StatsdBuilder;
-    /// StatsdBuilder::from("localhost", 8125).install(Some("prefix"));
+    /// let recorder = StatsdBuilder::from("localhost", 8125)
+    ///                .build(Some("prefix"))
+    ///                .expect("Could not create StatsdRecorder");
+    ///
+    /// metrics::set_boxed_recorder(Box::new(recorder));
     /// metrics::counter!("counter.name",10);
     /// ```
     /// will emit a counter metric name as `prefix.counter.name`
-    pub fn install(self, prefix: Option<&str>) -> Result<(), StatsdError> {
-        self.is_valid()?;
-        let recorder = self.build(prefix)?;
-        metrics::set_boxed_recorder(Box::new(recorder))?;
-        Ok(())
-    }
-
     pub fn build(self, prefix: Option<&str>) -> Result<StatsdRecorder, StatsdError> {
+        self.is_valid()?;
         // create a local udp socket where the communication needs to happen, the port is set to
         // 0 so that we can pick any available port on the host. We also want this socket to be
         // non-blocking
@@ -286,7 +283,7 @@ mod tests {
     #[should_panic]
     fn bad_host_name() {
         StatsdBuilder::from("", 10)
-            .install(None)
+            .build(None)
             .expect("this should panic");
     }
 
@@ -294,7 +291,7 @@ mod tests {
     #[should_panic]
     fn bad_port() {
         StatsdBuilder::from("127.0.0.1", 0)
-            .install(None)
+            .build(None)
             .expect("this should panic");
     }
 
