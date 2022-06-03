@@ -1,6 +1,8 @@
 //! A [`metrics`] exporter that supports reporting metrics to Statsd. This exporter is basically
 //! a thin wrapper on top of the [`cadence`] crate which supports Statsd/Datadog style metrics.
 //!
+//! **Versions of this crate are tightly coupled to metrics crate versions**
+//! 
 //! # Usage
 //!
 //! ```
@@ -122,8 +124,8 @@
 //! between `metrics-recorder-statsd` and `metrics`, you'll get a build-time error (rather than Cargo silently
 //! linking in two versions of `metrics`, which would result in `metrics` silently dropping all your data).
 //! 
-//! In addition, we align the version of this library with the version of metrics crate it uses. Hopefully that provides a somewhat 
-//! subtle hint to the users about what to expect compatibility wise between the two crates. 
+//! 
+
 
 mod recorder;
 
