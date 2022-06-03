@@ -99,7 +99,8 @@
 //! .with_queue_size(5000)
 //! .with_buffer_size(1024)
 //! .histogram_is_distribution()
-//! .build(Some("prefix")).expect("Could not create StatsdRecorder");
+//! .build(Some("prefix"))
+//! .expect("Could not create StatsdRecorder");
 //! 
 //! metrics::set_boxed_recorder(Box::new(recorder));
 //!```
