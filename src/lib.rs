@@ -6,11 +6,13 @@
 //! ```
 //! use metrics_exporter_statsd::StatsdBuilder;
 //!
-//! StatsdBuilder::from("127.0.0.1", 8125)
+//! let recorder = StatsdBuilder::from("127.0.0.1", 8125)
 //! .with_queue_size(5000)
 //! .with_buffer_size(1024)
-//! .install(Some("prefix"))
-//! .unwrap_or_else(|err| println!("yikes could not configure statsd {:?}", err))
+//! .build(Some("prefix"))
+//! .expect("Could not create StatsdRecorder");
+//! 
+//! metrics::set_boxed_recorder(Box::new(recorder));
 //! ```
 //!
 //! You can then continue to use [`metrics`] as usual:
@@ -93,12 +95,13 @@
 //! ```
 //! use metrics_exporter_statsd::StatsdBuilder;
 //!
-//! StatsdBuilder::from("127.0.0.1", 8125)
+//! let recorder = StatsdBuilder::from("127.0.0.1", 8125)
 //! .with_queue_size(5000)
 //! .with_buffer_size(1024)
 //! .histogram_is_distribution()
-//! .install(Some("prefix"))
-//! .unwrap_or_else(|err| println!("yikes could not configure statsd {:?}", err))
+//! .build(Some("prefix")).expect("Could not create StatsdRecorder");
+//! 
+//! metrics::set_boxed_recorder(Box::new(recorder));
 //!```
 //!
 //! Once the exporter is marked this way then all the histograms will be reported as distributions
@@ -110,6 +113,20 @@
 //! This will emit a metric like this: `metric.name:100|d|#tag:value`, note the metric type has
 //! emitted here is `d` and not `h`.
 //!
+//! **Note:** Most of the other metrics-rs builders provide a convenience method for installing a global recorder. E.g
+//! for Prometheus or TCP metrics exporters you could do something along the lines of `PrometheusBuilder::new().install()`.
+//! 
+//! This library does not provide such convenience method, the reason being that this is a independent exporter library
+//! and the version of `metrics` library that this library depends on might defer from the version you app uses. This 
+//! causes cargo to link both versions of the metrics crate, resulting in recorder installed in `metric-exporter-statsd` and
+//! the calls to `metrics::*` going through the version linked to your app. 
+//! 
+//! Having this library only return a recorder prevents this problem and also surfaces any version mismatch issues from upgrading
+//! one but not the other. 
+//! 
+//! 
+//! In addition, we align the version of this library with the version of metrics crate it uses. Hopefully that provides a somewhat 
+//! subtle hint to the users about what to expect compatibility wise between the two crates. 
 
 mod recorder;
 
