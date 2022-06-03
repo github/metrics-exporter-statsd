@@ -116,14 +116,10 @@
 //! **Note:** Most of the other metrics-rs builders provide a convenience method for installing a global recorder. E.g
 //! for Prometheus or TCP metrics exporters you could do something along the lines of `PrometheusBuilder::new().install()`.
 //! 
-//! This library does not provide such convenience method, the reason being that this is a independent exporter library
-//! and the version of `metrics` library that this library depends on might defer from the version you app uses. This 
-//! causes cargo to link both versions of the metrics crate, resulting in recorder installed in `metric-exporter-statsd` and
-//! the calls to `metrics::*` going through the version linked to your app. 
-//! 
-//! Having this library only return a recorder prevents this problem and also surfaces any version mismatch issues from upgrading
-//! one but not the other. 
-//! 
+//! This library does not have an `.install()` method. Instead, use `.build()` and call
+//! `metrics::set_boxed_recorder`, as in the example code. This ensures that if you ever have a version mismatch
+//! between `metrics-recorder-statsd` and `metrics`, you'll get a build-time error (rather than Cargo silently
+//! linking in two versions of `metrics`, which would result in `metrics` silently dropping all your data).
 //! 
 //! In addition, we align the version of this library with the version of metrics crate it uses. Hopefully that provides a somewhat 
 //! subtle hint to the users about what to expect compatibility wise between the two crates. 
