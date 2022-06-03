@@ -124,7 +124,7 @@ impl StatsdBuilder {
         self
     }
 
-    /// This method is responsible building the StatsdRecorder. It configures the underlying metrics sink for 
+    /// This method is responsible building the StatsdRecorder. It configures the underlying metrics sink for
     /// the [`StatsdClient`] with the values provided e.g. `queue_size`, `buffer_size` etc.
     ///
     /// All the metrics emitted from the recorder are prefixed with the prefix that's provided here.
@@ -133,9 +133,9 @@ impl StatsdBuilder {
     /// ```
     /// use metrics_exporter_statsd::StatsdBuilder;
     /// let recorder = StatsdBuilder::from("localhost", 8125)
-    /// .build(Some("prefix"))
-    /// .expect("Could not create StatsdRecorder");
-    /// 
+    ///                .build(Some("prefix"))
+    ///                .expect("Could not create StatsdRecorder");
+    ///
     /// metrics::set_boxed_recorder(Box::new(recorder));
     /// metrics::counter!("counter.name",10);
     /// ```

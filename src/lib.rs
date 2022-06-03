@@ -2,7 +2,7 @@
 //! a thin wrapper on top of the [`cadence`] crate which supports Statsd/Datadog style metrics.
 //!
 //! **Versions of this crate are tightly coupled to metrics crate versions**
-//! 
+//!
 //! # Usage
 //!
 //! ```
@@ -13,7 +13,7 @@
 //! .with_buffer_size(1024)
 //! .build(Some("prefix"))
 //! .expect("Could not create StatsdRecorder");
-//! 
+//!
 //! metrics::set_boxed_recorder(Box::new(recorder));
 //! ```
 //!
@@ -103,7 +103,7 @@
 //! .histogram_is_distribution()
 //! .build(Some("prefix"))
 //! .expect("Could not create StatsdRecorder");
-//! 
+//!
 //! metrics::set_boxed_recorder(Box::new(recorder));
 //!```
 //!
@@ -118,15 +118,11 @@
 //!
 //! **Note:** Most of the other metrics-rs builders provide a convenience method for installing a global recorder. E.g
 //! for Prometheus or TCP metrics exporters you could do something along the lines of `PrometheusBuilder::new().install()`.
-//! 
+//!
 //! This library does not have an `.install()` method. Instead, use `.build()` and call
 //! `metrics::set_boxed_recorder`, as in the example code. This ensures that if you ever have a version mismatch
 //! between `metrics-recorder-statsd` and `metrics`, you'll get a build-time error (rather than Cargo silently
 //! linking in two versions of `metrics`, which would result in `metrics` silently dropping all your data).
-//! 
-//! 
-
-
 mod recorder;
 
 pub use self::recorder::*;
