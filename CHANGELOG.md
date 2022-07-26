@@ -1,3 +1,8 @@
+## [v0.4.0](https://github.com/github/metrics-exporter-statsd/tree/0.4.0) - 2022-07-27
+
+* Upgrade metrics-rs dependency to 0.20
+* Update describe_* methods to use SharedString to comply with new version requirements.
+
 ## [v0.3.0](https://github.com/github/metrics-exporter-statsd/tree/0.3.0) - 2022-06-03
 
 * Upgrade metrics-rs dependency to 0.19
