@@ -3,8 +3,8 @@ use std::time::Duration;
 
 use cadence::{Counted, Distributed, Gauged, Histogrammed, MetricBuilder, StatsdClient, Timed};
 use metrics::{Counter, CounterFn, SharedString};
-use metrics::{Gauge,GaugeFn};
-use metrics::{Histogram,HistogramFn};
+use metrics::{Gauge, GaugeFn};
+use metrics::{Histogram, HistogramFn};
 use metrics::{Key, KeyName, Label, Recorder, Unit};
 
 use crate::types::HistogramType;
