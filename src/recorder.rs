@@ -2,9 +2,10 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use cadence::{Counted, Distributed, Gauged, Histogrammed, MetricBuilder, StatsdClient, Timed};
-use metrics::{
-    Counter, CounterFn, Gauge, GaugeFn, Histogram, HistogramFn, Key, KeyName, Label, Recorder, Unit,
-};
+use metrics::{Counter, CounterFn, SharedString};
+use metrics::{Gauge,GaugeFn};
+use metrics::{Histogram,HistogramFn};
+use metrics::{Key, KeyName, Label, Recorder, Unit};
 
 use crate::types::HistogramType;
 
@@ -29,15 +30,15 @@ impl StatsdRecorder {
 }
 
 impl Recorder for StatsdRecorder {
-    fn describe_counter(&self, _key: KeyName, _unit: Option<Unit>, _description: &'static str) {
+    fn describe_counter(&self, _key: KeyName, _unit: Option<Unit>, _description: SharedString) {
         unimplemented!("statsd recording does not support descriptions.")
     }
 
-    fn describe_gauge(&self, _key: KeyName, _unit: Option<Unit>, _description: &'static str) {
+    fn describe_gauge(&self, _key: KeyName, _unit: Option<Unit>, _description: SharedString) {
         unimplemented!("statsd recording does not support descriptions.")
     }
 
-    fn describe_histogram(&self, _key: KeyName, _unit: Option<Unit>, _description: &'static str) {
+    fn describe_histogram(&self, _key: KeyName, _unit: Option<Unit>, _description: SharedString) {
         unimplemented!("statsd recording does not support descriptions.")
     }
 
