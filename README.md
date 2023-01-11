@@ -2,7 +2,7 @@
 
 A [metrics-rs](https://github.com/metrics-rs/metrics/) exporter that supports reporting metrics to StatsD. This exporter is basically a thin wrapper on top of the [`cadence`][cadence] crate which supports Statsd/Datadog style metrics.
 
-Check out [crates.io](https://crates.io/crates/metrics-exporter-statsd) documentation for how to use this library. 
+Check out [docs.rs documentation](https://docs.rs/metrics-exporter-statsd) for how to use this library.
 
 ## Contribution
 
