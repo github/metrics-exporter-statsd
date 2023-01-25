@@ -131,3 +131,5 @@ mod builder;
 mod types;
 
 pub use self::builder::*;
+
+pub use types::HistogramType;
