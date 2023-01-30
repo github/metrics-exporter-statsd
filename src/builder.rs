@@ -269,7 +269,9 @@ impl Default for StatsdBuilder {
 
 #[cfg(test)]
 mod tests {
+    use std::io;
     use std::net::UdpSocket;
+    use std::sync::{Arc, Mutex};
     use std::time::Duration;
 
     use metrics::{Key, Label, Recorder};
@@ -570,9 +572,6 @@ mod tests {
 
     #[test]
     fn test_custom_sink() {
-        use std::io;
-        use std::sync::{Arc, Mutex};
-
         struct BadSink {
             data: Arc<Mutex<String>>,
         }
@@ -581,6 +580,7 @@ mod tests {
             fn emit(&self, metric: &str) -> io::Result<usize> {
                 let mut writer = self.data.lock().unwrap();
                 *writer += metric;
+                writer.push('\n');
                 Ok(metric.len())
             }
         }
@@ -598,6 +598,6 @@ mod tests {
         counter.increment(1);
 
         let guard = s.lock().unwrap();
-        assert_eq!(guard.as_str(), "example_app.counter.name:1|c");
+        assert_eq!(guard.as_str(), "example_app.counter.name:1|c\n");
     }
 }
