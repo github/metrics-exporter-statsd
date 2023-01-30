@@ -580,7 +580,9 @@ mod tests {
 
         let s = Arc::new(Mutex::new(String::new()));
         let recorder = StatsdBuilder::from("", 0)
-            .with_sink(BadSink { data: Arc::clone(&s) })
+            .with_sink(BadSink {
+                data: Arc::clone(&s),
+            })
             .build(Some("example_app"))
             .expect("should build a recorder with custom sink");
 
