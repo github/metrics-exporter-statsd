@@ -15,18 +15,8 @@ use crate::types::HistogramType;
 /// for registering metrics with descriptions. This recorder's main responsibility is to map metrics
 /// library's interface/types to a supported [`StatsdClient`] calls/types.
 pub struct StatsdRecorder {
-    statsd: Arc<StatsdClient>,
-    default_histogram: HistogramType,
-}
-
-impl StatsdRecorder {
-    /// Initialize [`StatsdRecorder`] with provided [`cadence::StatsdClient`].
-    pub fn new(statsd: StatsdClient, default_histogram: HistogramType) -> Self {
-        StatsdRecorder {
-            statsd: Arc::new(statsd),
-            default_histogram,
-        }
-    }
+    pub(crate) statsd: Arc<StatsdClient>,
+    pub(crate) default_histogram: HistogramType,
 }
 
 impl Recorder for StatsdRecorder {
