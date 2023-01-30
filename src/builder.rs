@@ -49,6 +49,13 @@ pub enum StatsdError {
     },
 }
 
+/// Type used as a wrapper for a custom sink.
+///
+/// The alternative would be `Box<dyn MetricSink + Sync + Send + ...>` but that would incur `dyn`
+/// overhead each time a metric is written, whereas this incurs `dyn` overhead only once (the one
+/// time this closure is called, from `StatsdBuilder::build`).
+type BoxedSinkClosure = Box<dyn FnOnce(&str) -> StatsdClientBuilder>;
+
 /// [`StatsdBuilder`] is responsible building and configuring a [`StatsdRecorder`].
 pub struct StatsdBuilder {
     host: String,
@@ -58,7 +65,7 @@ pub struct StatsdBuilder {
     default_histogram: HistogramType,
     client_udp_host: String,
     default_tags: Vec<(String, String)>,
-    sink: Option<Box<dyn FnOnce(&str) -> StatsdClientBuilder>>,
+    sink: Option<BoxedSinkClosure>,
 }
 
 impl StatsdBuilder {
