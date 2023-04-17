@@ -13,5 +13,5 @@ categories = ["observability", "operations"]
 
 [dependencies]
 cadence = "0.29"
-metrics = "0.20"
+metrics = "0.21"
 thiserror = "1.0"
