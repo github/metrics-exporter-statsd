@@ -1,6 +1,6 @@
 [package]
 name = "metrics-exporter-statsd"
-version = "0.6.0"
+version = "0.6.1"
 authors = ["Manish Bellani <mbellani@github.com>"]
 edition = "2021"
 license = "MIT"
@@ -15,3 +15,4 @@ categories = ["observability", "operations"]
 cadence = "0.29"
 metrics = "0.21"
 thiserror = "1.0"
+log = { version = "0.4.20"}

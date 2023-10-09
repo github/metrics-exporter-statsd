@@ -4,7 +4,7 @@ use cadence::{BufferedUdpMetricSink, QueuingMetricSink, StatsdClient};
 use metrics::SetRecorderError;
 
 use crate::recorder::StatsdRecorder;
-use crate::types::HistogramType;
+use crate::types::{HistogramType, InvalidOperationsAction};
 use thiserror::Error;
 
 const DEFAULT_HOST: &str = "127.0.0.1";
@@ -54,6 +54,7 @@ pub struct StatsdBuilder {
     default_histogram: HistogramType,
     client_udp_host: String,
     default_tags: Vec<(String, String)>,
+    ivalid_operations_action: InvalidOperationsAction,
 }
 
 impl StatsdBuilder {
@@ -70,6 +71,7 @@ impl StatsdBuilder {
             default_histogram: HistogramType::Histogram,
             client_udp_host: CLIENT_UDP_HOST.to_string(),
             default_tags: Vec::new(),
+            ivalid_operations_action: InvalidOperationsAction::Panic
         }
     }
 
@@ -121,6 +123,14 @@ impl StatsdBuilder {
         V: ToString,
     {
         self.default_tags.push((key.to_string(), value.to_string()));
+        self
+    }
+
+    /// Set action to be taken when invalid operations for statsd are performed.
+    /// E.G. incrementing counter, describing metrics.
+    /// Default action is panic.
+    pub fn ignore_invalid_operations(mut self, action:InvalidOperationsAction) -> Self{
+        self.ivalid_operations_action=action;
         self
     }
 
@@ -194,6 +204,7 @@ impl Default for StatsdBuilder {
             default_histogram: HistogramType::Histogram,
             client_udp_host: CLIENT_UDP_HOST.to_string(),
             default_tags: Vec::new(),
+            ivalid_operations_action: InvalidOperationsAction::Panic
         }
     }
 }

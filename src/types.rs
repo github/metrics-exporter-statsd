@@ -43,3 +43,28 @@ impl From<&str> for HistogramType {
         }
     }
 }
+
+#[derive(Clone, Copy)]
+/// What to do if an invalid operation is attempted
+pub enum InvalidOperationsAction{
+    /// Silently ignore invalid operations
+    Ignore,
+    /// Log with `warn` level invalid operations
+    Log,
+    /// Panic on invalid operations (default)
+    Panic,
+}
+
+impl InvalidOperationsAction {
+    pub fn handle(&self, msg: &str) {
+        match self {
+            InvalidOperationsAction::Ignore => {}
+            InvalidOperationsAction::Log => {
+                log::warn!("{}",msg)
+            }
+            InvalidOperationsAction::Panic => {
+                unimplemented!("{}", msg)
+            }
+        }
+    }
+}

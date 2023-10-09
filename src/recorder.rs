@@ -7,7 +7,7 @@ use metrics::{Gauge, GaugeFn};
 use metrics::{Histogram, HistogramFn};
 use metrics::{Key, KeyName, Label, Recorder, Unit};
 
-use crate::types::HistogramType;
+use crate::types::{HistogramType, InvalidOperationsAction};
 
 /// A recorder for sending the reported metrics to Statsd.
 /// Under the hood this recorder uses [`StatsdClient`] implementation provided by [`cadence`] crate.
@@ -17,6 +17,7 @@ use crate::types::HistogramType;
 pub struct StatsdRecorder {
     statsd: Arc<StatsdClient>,
     default_histogram: HistogramType,
+    invalid_operation_action: InvalidOperationsAction,
 }
 
 impl StatsdRecorder {
@@ -25,21 +26,22 @@ impl StatsdRecorder {
         StatsdRecorder {
             statsd: Arc::new(statsd),
             default_histogram,
+            invalid_operation_action: InvalidOperationsAction::Panic
         }
     }
 }
 
 impl Recorder for StatsdRecorder {
     fn describe_counter(&self, _key: KeyName, _unit: Option<Unit>, _description: SharedString) {
-        unimplemented!("statsd recording does not support descriptions.")
+        self.invalid_operation_action.handle("statsd recording does not support descriptions.")
     }
 
     fn describe_gauge(&self, _key: KeyName, _unit: Option<Unit>, _description: SharedString) {
-        unimplemented!("statsd recording does not support descriptions.")
+        self.invalid_operation_action.handle("statsd recording does not support descriptions.")
     }
 
     fn describe_histogram(&self, _key: KeyName, _unit: Option<Unit>, _description: SharedString) {
-        unimplemented!("statsd recording does not support descriptions.")
+        self.invalid_operation_action.handle("statsd recording does not support descriptions.")
     }
 
     fn register_counter(&self, key: &Key) -> Counter {
@@ -71,6 +73,7 @@ struct Handle {
     key: Key,
     statsd: Arc<StatsdClient>,
     default_histogram: HistogramType,
+    invalid_operation_action: InvalidOperationsAction,
 }
 
 impl Handle {
@@ -79,6 +82,7 @@ impl Handle {
             key,
             statsd,
             default_histogram,
+            invalid_operation_action: InvalidOperationsAction::Panic
         }
     }
 
@@ -103,17 +107,17 @@ impl CounterFn for Handle {
     }
 
     fn absolute(&self, _value: u64) {
-        unimplemented!("statsd recording does not support setting absolute values on counters")
+        self.invalid_operation_action.handle("statsd recording does not support setting absolute values on counters")
     }
 }
 
 impl GaugeFn for Handle {
     fn increment(&self, _value: f64) {
-        unimplemented!("statsd recording does not support incrementing gauge values because it doesn't know the prior value.")
+       self.invalid_operation_action.handle("statsd recording does not support incrementing gauge values because it doesn't know the prior value.")
     }
 
     fn decrement(&self, _value: f64) {
-        unimplemented!("statsd recording does not support decrementing gauge values because it doesn't know the prior value.")
+        self.invalid_operation_action.handle("statsd recording does not support decrementing gauge values because it doesn't know the prior value.")
     }
 
     fn set(&self, value: f64) {
