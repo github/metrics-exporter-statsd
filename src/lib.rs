@@ -14,19 +14,19 @@
 //! .build(Some("prefix"))
 //! .expect("Could not create StatsdRecorder");
 //!
-//! metrics::set_boxed_recorder(Box::new(recorder));
+//! metrics::set_global_recorder(recorder);
 //! ```
 //!
 //! You can then continue to use [`metrics`] as usual:
 //!
 //! ```
-//! metrics::increment_counter!("counter.name");
+//! metrics::counter!("counter.name").increment(1);
 //! ```
 //!
 //! Labels are translated to datadog style tags:
 //!
 //!```
-//! metrics::gauge!("gauge.name", 100.0 , "tag" => "value");
+//! metrics::gauge!("gauge.name", "tag" => "value").set(100.0);
 //!```
 //! will translate to `gauge.name:50.25|g|#tag:value` and should render appropriately in systems
 //! like Datadog.
@@ -56,7 +56,7 @@
 //! like to override it for a given metric you can still do so:
 //!
 //! ```
-//! metrics::histogram!("metric.name", 100.0, "histogram"=> "histogram","tag"=>"value")
+//! metrics::histogram!("metric.name", "histogram"=> "histogram","tag"=>"value").record(100.0)
 //! ```
 //! This will emit the usual histogram metric this `metric.name:100|h|#tag:value`.
 //!
@@ -73,7 +73,7 @@
 //!
 //! **Reporting distributions:**
 //! ```
-//! metrics::histogram!("metric.name", 100.0, "histogram"=>"distribution", "tag"=>"value")
+//! metrics::histogram!("metric.name", "histogram"=>"distribution", "tag"=>"value").record(100.0)
 //! ```
 //! This will emit a metric like this: `metric.name:100|d|#tag:value`, note the metric type has
 //! changed from `h` to `d`.
@@ -84,7 +84,7 @@
 //!
 //! **Reporting timers:**
 //! ```
-//! metrics::histogram!("metric.name", 100.0, "histogram"=>"timer", "tag"=>"value")
+//! metrics::histogram!("metric.name", "histogram"=>"timer", "tag"=>"value").record(100.0)
 //! ```
 //! This will emit a metric like this: `metric.name:100|ms|#tag:value`, note the metric type has
 //! changed from `h` to `ms`.
@@ -104,14 +104,14 @@
 //! .build(Some("prefix"))
 //! .expect("Could not create StatsdRecorder");
 //!
-//! metrics::set_boxed_recorder(Box::new(recorder));
+//! metrics::set_global_recorder(recorder);
 //!```
 //!
 //! Once the exporter is marked this way then all the histograms will be reported as distributions
 //! by default unless labeled differently. For example following statement:
 //!
 //! ```
-//! metrics::histogram!("metric.name", 100.0, "tag"=>"value")
+//! metrics::histogram!("metric.name", "tag"=>"value").record(100.0)
 //! ```
 //! This will emit a metric like this: `metric.name:100|d|#tag:value`, note the metric type has
 //! emitted here is `d` and not `h`.
