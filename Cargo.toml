@@ -12,6 +12,6 @@ keywords = ["metrics", "statsd"]
 categories = ["observability", "operations"]
 
 [dependencies]
-cadence = "0.29"
+cadence = "1.0"
 metrics = "0.22"
 thiserror = "1.0"
