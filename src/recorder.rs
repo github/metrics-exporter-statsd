@@ -5,7 +5,7 @@ use cadence::{Counted, Distributed, Gauged, Histogrammed, MetricBuilder, StatsdC
 use metrics::{Counter, CounterFn, SharedString};
 use metrics::{Gauge, GaugeFn};
 use metrics::{Histogram, HistogramFn};
-use metrics::{Key, KeyName, Label, Recorder, Unit};
+use metrics::{Key, KeyName, Label, Metadata, Recorder, Unit};
 
 use crate::types::HistogramType;
 
@@ -42,7 +42,7 @@ impl Recorder for StatsdRecorder {
         unimplemented!("statsd recording does not support descriptions.")
     }
 
-    fn register_counter(&self, key: &Key) -> Counter {
+    fn register_counter(&self, key: &Key, _metadata: &Metadata<'_>) -> Counter {
         Counter::from_arc(Arc::new(Handle::new(
             key.clone(),
             self.statsd.clone(),
@@ -50,7 +50,7 @@ impl Recorder for StatsdRecorder {
         )))
     }
 
-    fn register_gauge(&self, key: &Key) -> Gauge {
+    fn register_gauge(&self, key: &Key, _metadata: &Metadata<'_>) -> Gauge {
         Gauge::from_arc(Arc::new(Handle::new(
             key.clone(),
             self.statsd.clone(),
@@ -58,7 +58,7 @@ impl Recorder for StatsdRecorder {
         )))
     }
 
-    fn register_histogram(&self, key: &Key) -> Histogram {
+    fn register_histogram(&self, key: &Key, _metadata: &Metadata<'_>) -> Histogram {
         Histogram::from_arc(Arc::new(Handle::new(
             key.clone(),
             self.statsd.clone(),
