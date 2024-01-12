@@ -164,7 +164,7 @@ impl StatsdBuilder {
     /// let recorder = StatsdBuilder::from("", 0)
     ///     .with_sink(sink)
     ///     .build(Some("my_app"))?;
-    /// metrics::set_boxed_recorder(Box::new(recorder));
+    /// metrics::set_global_recorder(recorder);
     /// #     Ok(())
     /// # }
     /// ```
@@ -597,7 +597,7 @@ mod tests {
             .expect("should build a recorder with custom sink");
 
         let key = Key::from_name("counter.name");
-        let counter = recorder.register_counter(&key);
+        let counter = recorder.register_counter(&key, &METADATA);
         counter.increment(1);
 
         let guard = s.lock().unwrap();
