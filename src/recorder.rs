@@ -31,15 +31,15 @@ impl StatsdRecorder {
 
 impl Recorder for StatsdRecorder {
     fn describe_counter(&self, _key: KeyName, _unit: Option<Unit>, _description: SharedString) {
-        unimplemented!("statsd recording does not support descriptions.")
+        // statsd recording does not support descriptions.
     }
 
     fn describe_gauge(&self, _key: KeyName, _unit: Option<Unit>, _description: SharedString) {
-        unimplemented!("statsd recording does not support descriptions.")
+        // statsd recording does not support descriptions.
     }
 
     fn describe_histogram(&self, _key: KeyName, _unit: Option<Unit>, _description: SharedString) {
-        unimplemented!("statsd recording does not support descriptions.")
+        // statsd recording does not support descriptions.
     }
 
     fn register_counter(&self, key: &Key, _metadata: &Metadata<'_>) -> Counter {
@@ -103,17 +103,19 @@ impl CounterFn for Handle {
     }
 
     fn absolute(&self, _value: u64) {
-        unimplemented!("statsd recording does not support setting absolute values on counters")
+        // statsd recording does not support setting absolute values on counters
     }
 }
 
 impl GaugeFn for Handle {
     fn increment(&self, _value: f64) {
-        unimplemented!("statsd recording does not support incrementing gauge values because it doesn't know the prior value.")
+        // statsd recording does not support incrementing gauge values because it doesn't know the
+        // prior value.
     }
 
     fn decrement(&self, _value: f64) {
-        unimplemented!("statsd recording does not support decrementing gauge values because it doesn't know the prior value.")
+        // statsd recording does not support decrementing gauge values because it doesn't know the
+        // prior value.
     }
 
     fn set(&self, value: f64) {
