@@ -1,3 +1,10 @@
+## [v0.7.0](https://github.com/github/metrics-exporter-statsd/tree/0.7.0) - 2024-01-12
+
+* Upgrade metrics-rs to 0.22. This is a major breaking change in `metrics`.
+* Add [custom sinks](https://github.com/github/metrics-exporter-statsd/pull/23).
+* [Don't panic](https://github.com/github/metrics-exporter-statsd/pull/46) when
+  the application uses a `metrics` operation that is not supported by `statsd`.
+
 ## [v0.6.0](https://github.com/github/metrics-exporter-statsd/tree/0.6.0) - 2023-04-25
 
 This release mostly contains version upgrades for the following crates:
