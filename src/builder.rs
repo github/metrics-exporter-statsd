@@ -1,6 +1,10 @@
 use std::net::UdpSocket;
+use std::panic::RefUnwindSafe;
+use std::sync::Arc;
 
-use cadence::{BufferedUdpMetricSink, QueuingMetricSink, StatsdClient};
+use cadence::{
+    BufferedUdpMetricSink, MetricSink, QueuingMetricSink, StatsdClient, StatsdClientBuilder,
+};
 use metrics::SetRecorderError;
 
 use crate::recorder::StatsdRecorder;
@@ -45,6 +49,13 @@ pub enum StatsdError {
     },
 }
 
+/// Type used as a wrapper for a custom sink.
+///
+/// The alternative would be `Box<dyn MetricSink + Sync + Send + ...>` but that would incur `dyn`
+/// overhead each time a metric is written, whereas this incurs `dyn` overhead only once (the one
+/// time this closure is called, from `StatsdBuilder::build`).
+type BoxedSinkClosure = Box<dyn FnOnce(&str) -> StatsdClientBuilder>;
+
 /// [`StatsdBuilder`] is responsible building and configuring a [`StatsdRecorder`].
 pub struct StatsdBuilder {
     host: String,
@@ -54,6 +65,7 @@ pub struct StatsdBuilder {
     default_histogram: HistogramType,
     client_udp_host: String,
     default_tags: Vec<(String, String)>,
+    sink: Option<BoxedSinkClosure>,
 }
 
 impl StatsdBuilder {
@@ -70,6 +82,7 @@ impl StatsdBuilder {
             default_histogram: HistogramType::Histogram,
             client_udp_host: CLIENT_UDP_HOST.to_string(),
             default_tags: Vec::new(),
+            sink: None,
         }
     }
 
@@ -124,6 +137,47 @@ impl StatsdBuilder {
         self
     }
 
+    /// Use a custom `MetricSink`.
+    ///
+    /// This method supersedes all other settings for metrics output, including the hostname and
+    /// port specified in [`StatsdBuilder::from`] and values passed to the `with_queue_size`,
+    /// `with_buffer_size`, and `with_client_udp_host` methods. The specified `sink` is used
+    /// instead.
+    ///
+    /// (When this method is not called, the builder creates a default sink using those settings,
+    /// [`cadence::QueuingMetricSink`], and [`cadence::UdpMetricSink`].)
+    ///
+    /// # Examples
+    ///
+    /// This code replaces the ordinary UDP sink with output to a Unix socket.
+    ///
+    /// ```no_run
+    /// use metrics_exporter_statsd::StatsdBuilder;
+    /// use cadence::BufferedUnixMetricSink;
+    /// use std::os::unix::net::UnixDatagram;
+    ///
+    /// # fn main() -> Result<(), Box<dyn std::error::Error + Sync + Send>> {
+    /// let path = "/path/to/my/metrics/socket";
+    /// let socket = UnixDatagram::bind(path)?;
+    /// let sink = BufferedUnixMetricSink::from(path, socket);
+    ///
+    /// let recorder = StatsdBuilder::from("", 0)
+    ///     .with_sink(sink)
+    ///     .build(Some("my_app"))?;
+    /// metrics::set_global_recorder(recorder);
+    /// #     Ok(())
+    /// # }
+    /// ```
+    pub fn with_sink<T>(mut self, sink: T) -> Self
+    where
+        T: MetricSink + Sync + Send + RefUnwindSafe + 'static,
+    {
+        self.sink = Some(Box::new(move |prefix: &str| {
+            StatsdClient::builder(prefix, sink)
+        }));
+        self
+    }
+
     /// This method is responsible building the StatsdRecorder. It configures the underlying metrics sink for
     /// the [`StatsdClient`] with the values provided e.g. `queue_size`, `buffer_size` etc.
     ///
@@ -142,43 +196,57 @@ impl StatsdBuilder {
     /// will emit a counter metric name as `prefix.counter.name`
     pub fn build(self, prefix: Option<&str>) -> Result<StatsdRecorder, StatsdError> {
         self.is_valid()?;
-        // create a local udp socket where the communication needs to happen, the port is set to
-        // 0 so that we can pick any available port on the host. We also want this socket to be
-        // non-blocking
-        let socket = UdpSocket::bind(format!("{}:{}", self.client_udp_host, 0))?;
-        socket.set_nonblocking(true)?;
-        // Initialize the statsd client with metrics sink that will be used to collect and send
-        // the metrics to the remote host.
-        let host = (self.host, self.port);
-        // Initialize buffered udp metrics sink with the provided or default capacity, this allows
-        // statsd client (cadence) to buffer metrics upto the configured size in memory before, flushing
-        // to network.
-        let udp_sink = BufferedUdpMetricSink::with_capacity(
-            host,
-            socket,
-            self.buffer_size.unwrap_or(DEFAULT_BUFFER_SIZE),
-        )?;
-        // Initialize a bounded QueuingMetricSink so that we are not buffering unlimited items onto
-        // statsd client's queue, statsd client will error out when the queue is full.
-        let sink = QueuingMetricSink::with_capacity(
-            udp_sink,
-            self.queue_size.unwrap_or(DEFAULT_BUFFER_SIZE),
-        );
 
-        let mut builder = StatsdClient::builder(prefix.unwrap_or(""), sink);
+        let prefix = prefix.unwrap_or("");
+        let mut builder = match self.sink {
+            Some(sink_fn) => sink_fn(prefix),
+            None => {
+                // create a local udp socket where the communication needs to happen, the port is set to
+                // 0 so that we can pick any available port on the host. We also want this socket to be
+                // non-blocking
+                let socket = UdpSocket::bind(format!("{}:{}", self.client_udp_host, 0))?;
+                socket.set_nonblocking(true)?;
+                // Initialize the statsd client with metrics sink that will be used to collect and send
+                // the metrics to the remote host.
+                let host = (self.host, self.port);
+
+                // Initialize buffered udp metrics sink with the provided or default capacity, this allows
+                // statsd client (cadence) to buffer metrics upto the configured size in memory before, flushing
+                // to network.
+                let udp_sink = BufferedUdpMetricSink::with_capacity(
+                    host,
+                    socket,
+                    self.buffer_size.unwrap_or(DEFAULT_BUFFER_SIZE),
+                )?;
+                // Initialize a bounded QueuingMetricSink so that we are not buffering unlimited items onto
+                // statsd client's queue, statsd client will error out when the queue is full.
+                let sink = QueuingMetricSink::with_capacity(
+                    udp_sink,
+                    self.queue_size.unwrap_or(DEFAULT_BUFFER_SIZE),
+                );
+                StatsdClient::builder(prefix, sink)
+            }
+        };
+
         for (key, value) in self.default_tags {
             builder = builder.with_tag(key, value);
         }
 
-        Ok(StatsdRecorder::new(builder.build(), self.default_histogram))
+        Ok(StatsdRecorder {
+            statsd: Arc::new(builder.build()),
+            default_histogram: self.default_histogram,
+        })
     }
 
     fn is_valid(&self) -> Result<(), StatsdError> {
-        if self.host.trim().is_empty() {
-            return Err(StatsdError::InvalidHost);
-        }
-        if self.port == 0 {
-            return Err(StatsdError::InvalidPortZero);
+        // Check settings only if we are going to use them.
+        if self.sink.is_none() {
+            if self.host.trim().is_empty() {
+                return Err(StatsdError::InvalidHost);
+            }
+            if self.port == 0 {
+                return Err(StatsdError::InvalidPortZero);
+            }
         }
         Ok(())
     }
@@ -194,19 +262,21 @@ impl Default for StatsdBuilder {
             default_histogram: HistogramType::Histogram,
             client_udp_host: CLIENT_UDP_HOST.to_string(),
             default_tags: Vec::new(),
+            sink: None,
         }
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use std::io;
     use std::net::UdpSocket;
+    use std::sync::{Arc, Mutex};
     use std::time::Duration;
 
     use metrics::{Key, Label, Recorder};
 
-    use crate::builder::StatsdBuilder;
-    use crate::recorder::StatsdRecorder;
+    use super::*;
 
     pub struct Environ {
         server_socket: UdpSocket,
@@ -501,5 +571,36 @@ mod tests {
             "counter.name:1|c|#app_name:test,blackbird_cluster:magenta",
             env.receive_on_server()
         );
+    }
+
+    #[test]
+    fn test_custom_sink() {
+        struct BadSink {
+            data: Arc<Mutex<String>>,
+        }
+
+        impl MetricSink for BadSink {
+            fn emit(&self, metric: &str) -> io::Result<usize> {
+                let mut writer = self.data.lock().unwrap();
+                *writer += metric;
+                writer.push('\n');
+                Ok(metric.len())
+            }
+        }
+
+        let s = Arc::new(Mutex::new(String::new()));
+        let recorder = StatsdBuilder::from("", 0)
+            .with_sink(BadSink {
+                data: Arc::clone(&s),
+            })
+            .build(Some("example_app"))
+            .expect("should build a recorder with custom sink");
+
+        let key = Key::from_name("counter.name");
+        let counter = recorder.register_counter(&key, &METADATA);
+        counter.increment(1);
+
+        let guard = s.lock().unwrap();
+        assert_eq!(guard.as_str(), "example_app.counter.name:1|c\n");
     }
 }
