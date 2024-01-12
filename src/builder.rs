@@ -45,7 +45,7 @@ pub enum StatsdError {
     #[error("Could not register the metrics recorder")]
     RecorderError {
         #[from]
-        source: SetRecorderError,
+        source: SetRecorderError<StatsdRecorder>,
     },
 }
 
@@ -190,8 +190,8 @@ impl StatsdBuilder {
     ///                .build(Some("prefix"))
     ///                .expect("Could not create StatsdRecorder");
     ///
-    /// metrics::set_boxed_recorder(Box::new(recorder));
-    /// metrics::counter!("counter.name",10);
+    /// metrics::set_global_recorder(recorder);
+    /// metrics::counter!("counter.name").increment(10);
     /// ```
     /// will emit a counter metric name as `prefix.counter.name`
     pub fn build(self, prefix: Option<&str>) -> Result<StatsdRecorder, StatsdError> {
@@ -349,6 +349,9 @@ mod tests {
         }
     }
 
+    static METADATA: metrics::Metadata =
+        metrics::Metadata::new(module_path!(), metrics::Level::INFO, Some(module_path!()));
+
     #[test]
     #[should_panic]
     fn bad_host_name() {
@@ -369,7 +372,7 @@ mod tests {
     fn counter() {
         let env = Environ::new(None);
         let key = Key::from_name("counter.name");
-        let counter = env.recorder.register_counter(&key);
+        let counter = env.recorder.register_counter(&key, &METADATA);
         counter.increment(1);
         assert_eq!("counter.name:1|c", env.receive_on_server());
     }
@@ -380,7 +383,7 @@ mod tests {
         let tags = vec![Label::new("t1", "v1"), Label::new("t2", "v2")];
         let key = Key::from(("counter.name", tags));
 
-        let coutner = env.recorder.register_counter(&key);
+        let coutner = env.recorder.register_counter(&key, &METADATA);
         coutner.increment(10);
         assert_eq!("counter.name:10|c|#t1:v1,t2:v2", env.receive_on_server());
     }
@@ -389,7 +392,7 @@ mod tests {
     fn gauge() {
         let env = Environ::new(None);
         let key = Key::from_name("gauge.name");
-        let gauge = env.recorder.register_gauge(&key);
+        let gauge = env.recorder.register_gauge(&key, &METADATA);
         gauge.set(50.25);
         assert_eq!("gauge.name:50.25|g", env.receive_on_server());
     }
@@ -399,7 +402,7 @@ mod tests {
         let env = Environ::new(None);
         let tags = vec![Label::new("t1", "v1"), Label::new("t2", "v2")];
         let key = Key::from(("gauge.name", tags));
-        let gauge = env.recorder.register_gauge(&key);
+        let gauge = env.recorder.register_gauge(&key, &METADATA);
         gauge.set(50.25);
         assert_eq!("gauge.name:50.25|g|#t1:v1,t2:v2", env.receive_on_server());
     }
@@ -408,7 +411,7 @@ mod tests {
     fn histogram() {
         let env = Environ::new(None);
         let key = Key::from_name("histogram.name");
-        let histogram = env.recorder.register_histogram(&key);
+        let histogram = env.recorder.register_histogram(&key, &METADATA);
         histogram.record(100.00);
         assert_eq!("histogram.name:100|h", env.receive_on_server());
     }
@@ -417,7 +420,7 @@ mod tests {
     fn histogram_with_decimals() {
         let env = Environ::new(None);
         let key = Key::from_name("histogram.name");
-        let histogram = env.recorder.register_histogram(&key);
+        let histogram = env.recorder.register_histogram(&key, &METADATA);
         histogram.record(100.52);
         assert_eq!("histogram.name:100.52|h", env.receive_on_server());
     }
@@ -427,7 +430,7 @@ mod tests {
         let env = Environ::new_histogram_is_distribution();
         let key = Key::from_name("distribution.name");
 
-        let histogram = env.recorder.register_histogram(&key);
+        let histogram = env.recorder.register_histogram(&key, &METADATA);
         histogram.record(100.52);
         assert_eq!("distribution.name:100.52|d", env.receive_on_server());
     }
@@ -438,7 +441,7 @@ mod tests {
         let tags = vec![Label::new("t1", "v1"), Label::new("t2", "v2")];
         let key = Key::from(("histogram.name", tags));
 
-        let histogram = env.recorder.register_histogram(&key);
+        let histogram = env.recorder.register_histogram(&key, &METADATA);
         histogram.record(100.00);
         assert_eq!("histogram.name:100|h|#t1:v1,t2:v2", env.receive_on_server());
     }
@@ -453,7 +456,7 @@ mod tests {
         ];
         let key = Key::from(("distribution.name", tags));
 
-        let histogram = env.recorder.register_histogram(&key);
+        let histogram = env.recorder.register_histogram(&key, &METADATA);
         histogram.record(100.00);
         assert_eq!(
             "distribution.name:100|d|#t1:v1,t2:v2",
@@ -471,7 +474,7 @@ mod tests {
         ];
         let key = Key::from(("distribution.name", tags));
 
-        let histogram = env.recorder.register_histogram(&key);
+        let histogram = env.recorder.register_histogram(&key, &METADATA);
         histogram.record(100.00);
         assert_eq!(
             "blackbird.distribution.name:100|d|#t1:v1,t2:v2",
@@ -485,7 +488,7 @@ mod tests {
         let tags = vec![Label::new("t1", "v1"), Label::new("t2", "v2")];
         let key = Key::from(("histogram.name", tags));
 
-        let histogram = env.recorder.register_histogram(&key);
+        let histogram = env.recorder.register_histogram(&key, &METADATA);
         histogram.record(100.00);
         assert_eq!(
             "blackbird.histogram.name:100|h|#t1:v1,t2:v2",
@@ -503,7 +506,7 @@ mod tests {
         ];
         let key = Key::from(("histogram.name", tags));
 
-        let histogram = env.recorder.register_histogram(&key);
+        let histogram = env.recorder.register_histogram(&key, &METADATA);
         histogram.record(100.00);
         // metrics-rs reports the unit as seconds and we convert it to ms
         assert_eq!(
@@ -518,7 +521,7 @@ mod tests {
         let tags = vec![Label::new("t1", "v1"), Label::new("t2", "v2")];
         let key = Key::from(("histogram.name", tags));
 
-        let histogram = env.recorder.register_histogram(&key);
+        let histogram = env.recorder.register_histogram(&key, &METADATA);
         histogram.record(100.00);
         assert_eq!("histogram.name:100|d|#t1:v1,t2:v2", env.receive_on_server());
     }
@@ -529,7 +532,7 @@ mod tests {
         let tags = vec![Label::new("t1", "v1"), Label::new("t2", "v2")];
         let key = Key::from(("histogram.name", tags));
 
-        let histogram = env.recorder.register_histogram(&key);
+        let histogram = env.recorder.register_histogram(&key, &METADATA);
         histogram.record(100.00);
         // metrics-rs reports the unit as seconds and we convert it to ms
         assert_eq!(
@@ -542,7 +545,7 @@ mod tests {
     fn prefix() {
         let env = Environ::new(Some("koelbird"));
         let key = Key::from_name("counter.name");
-        let counter = env.recorder.register_counter(&key);
+        let counter = env.recorder.register_counter(&key, &METADATA);
         counter.increment(1);
         assert_eq!("koelbird.counter.name:1|c", env.receive_on_server());
     }
@@ -561,7 +564,7 @@ mod tests {
         };
 
         let key = Key::from_name("counter.name");
-        let counter = env.recorder.register_counter(&key);
+        let counter = env.recorder.register_counter(&key, &METADATA);
 
         counter.increment(1);
         assert_eq!(

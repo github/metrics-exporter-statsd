@@ -5,7 +5,7 @@ use cadence::{Counted, Distributed, Gauged, Histogrammed, MetricBuilder, StatsdC
 use metrics::{Counter, CounterFn, SharedString};
 use metrics::{Gauge, GaugeFn};
 use metrics::{Histogram, HistogramFn};
-use metrics::{Key, KeyName, Label, Recorder, Unit};
+use metrics::{Key, KeyName, Label, Metadata, Recorder, Unit};
 
 use crate::types::HistogramType;
 
@@ -21,18 +21,18 @@ pub struct StatsdRecorder {
 
 impl Recorder for StatsdRecorder {
     fn describe_counter(&self, _key: KeyName, _unit: Option<Unit>, _description: SharedString) {
-        unimplemented!("statsd recording does not support descriptions.")
+        // statsd recording does not support descriptions.
     }
 
     fn describe_gauge(&self, _key: KeyName, _unit: Option<Unit>, _description: SharedString) {
-        unimplemented!("statsd recording does not support descriptions.")
+        // statsd recording does not support descriptions.
     }
 
     fn describe_histogram(&self, _key: KeyName, _unit: Option<Unit>, _description: SharedString) {
-        unimplemented!("statsd recording does not support descriptions.")
+        // statsd recording does not support descriptions.
     }
 
-    fn register_counter(&self, key: &Key) -> Counter {
+    fn register_counter(&self, key: &Key, _metadata: &Metadata<'_>) -> Counter {
         Counter::from_arc(Arc::new(Handle::new(
             key.clone(),
             self.statsd.clone(),
@@ -40,7 +40,7 @@ impl Recorder for StatsdRecorder {
         )))
     }
 
-    fn register_gauge(&self, key: &Key) -> Gauge {
+    fn register_gauge(&self, key: &Key, _metadata: &Metadata<'_>) -> Gauge {
         Gauge::from_arc(Arc::new(Handle::new(
             key.clone(),
             self.statsd.clone(),
@@ -48,7 +48,7 @@ impl Recorder for StatsdRecorder {
         )))
     }
 
-    fn register_histogram(&self, key: &Key) -> Histogram {
+    fn register_histogram(&self, key: &Key, _metadata: &Metadata<'_>) -> Histogram {
         Histogram::from_arc(Arc::new(Handle::new(
             key.clone(),
             self.statsd.clone(),
@@ -93,17 +93,19 @@ impl CounterFn for Handle {
     }
 
     fn absolute(&self, _value: u64) {
-        unimplemented!("statsd recording does not support setting absolute values on counters")
+        // statsd recording does not support setting absolute values on counters
     }
 }
 
 impl GaugeFn for Handle {
     fn increment(&self, _value: f64) {
-        unimplemented!("statsd recording does not support incrementing gauge values because it doesn't know the prior value.")
+        // statsd recording does not support incrementing gauge values because it doesn't know the
+        // prior value.
     }
 
     fn decrement(&self, _value: f64) {
-        unimplemented!("statsd recording does not support decrementing gauge values because it doesn't know the prior value.")
+        // statsd recording does not support decrementing gauge values because it doesn't know the
+        // prior value.
     }
 
     fn set(&self, value: f64) {
