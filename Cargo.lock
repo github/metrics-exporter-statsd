@@ -16,9 +16,9 @@ dependencies = [
 
 [[package]]
 name = "cadence"
-version = "1.0.0"
+version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eab51a759f502097abe855100b81b421d3a104b62a2c3209f751d90ce6dd2ea1"
+checksum = "472b6b55bd7e5410178ecd5d544b0bd6d6af926a960fae4048b570923dffdb08"
 dependencies = [
  "crossbeam-channel",
 ]
@@ -56,7 +56,7 @@ dependencies = [
 
 [[package]]
 name = "metrics-exporter-statsd"
-version = "0.6.0"
+version = "0.7.0"
 dependencies = [
  "cadence",
  "metrics",
