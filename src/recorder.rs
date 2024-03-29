@@ -87,8 +87,7 @@ impl Handle {
 
 impl CounterFn for Handle {
     fn increment(&self, value: u64) {
-        // this is an unfortunate conversion, probably deserves an issue on cadence?
-        let mb = self.statsd.count_with_tags(self.key.name(), value as i64);
+        let mb = self.statsd.count_with_tags(self.key.name());
         Self::apply_tags(self.key.labels().collect(), mb).send();
     }
 
