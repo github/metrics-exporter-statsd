@@ -15,7 +15,7 @@ function usage {
 }
 
 
-PKG_VERSION=$(cargo metadata --format-version 1 | jq  -r '.workspace_members[0]' | awk '{print $2}')
+PKG_VERSION=$(cargo metadata --format-version 1 | jq  -r '.workspace_members[0]' | awk -F'#' '{print $2}')
 MODE="--dry-run"
 TOKEN=
 VERSION=
