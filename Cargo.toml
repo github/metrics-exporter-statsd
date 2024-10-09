@@ -13,5 +13,5 @@ categories = ["observability", "operations"]
 
 [dependencies]
 metrics = "0.23"
-cadence = "1.4"
+cadence = "1.5.0"
 thiserror = "1.0"
