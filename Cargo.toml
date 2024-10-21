@@ -9,7 +9,7 @@ readme = "README.md"
 repository = "https://github.com/github/metrics-exporter-statsd"
 homepage = "https://github.com/github/metrics-exporter-statsd"
 keywords = ["metrics", "statsd"]
-categories = ["observability", "operations"]
+categories = ["development-tools"]
 
 [dependencies]
 metrics = "0.24"
