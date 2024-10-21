@@ -1,3 +1,11 @@
+## [v0.9.0](https://github.com/github/metrics-exporter-statsd/tree/0.9.0) - 2024-10-21
+
+Version bumps for the following dependencies
+
+- [cadence 1.5.0](https://github.com/github/metrics-exporter-statsd/pull/67)
+- [thiserror 1.0.64](https://github.com/github/metrics-exporter-statsd/pull/66)
+- [metrics-rs 0.24.0](https://github.com/github/metrics-exporter-statsd/pull/70)
+
 ## [v0.8.0](https://github.com/github/metrics-exporter-statsd/tree/0.7.0) - 2024-05-30
 
 * metrics-rs [0.23]((https://github.com/github/metrics-exporter-statsd/pull/60)). This is a breaking change requiring MSRVV bump to 1.70.0 (from 1.65.0). Thanks @ijc for the PR.
