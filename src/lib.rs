@@ -6,9 +6,9 @@
 //! * **Versions of this crate are tightly coupled to metrics crate versions.**
 //!
 //! * [`metrics::Counter::absolute`], [`metrics::Gauge::increment`], and
-//!     [`metrics::Gauge::decrement`] are not supported. Statsd doesn't have these concepts.
-//!     Unfortunately this means that if the application is using these methods, the metrics will
-//!     silently be missing or wrong.
+//!   [`metrics::Gauge::decrement`] are not supported. Statsd doesn't have these concepts.
+//!   Unfortunately this means that if the application is using these methods, the metrics will
+//!   silently be missing or wrong.
 //!
 //! # Usage
 //!
