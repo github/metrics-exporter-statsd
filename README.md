@@ -14,17 +14,6 @@ This project is licensed under the terms of the MIT open source license. Please 
 
 ## Acknowledgement
 
-metrics-exporter-statsd is authored, reviewed and tested by the code search team at GitHub:
-
- - @gorzell
- - @look
- - @mbellani 
- - @tclem
- - @terrhorn
- - @colinwm
- - @jorendorff
- - @aneubeck
-
-Special thanks to the authors of [metrics-rs](https://github.com/metrics-rs/metrics/) and [cadence] libraries. 
+metrics-exporter-statsd is authored, reviewed and tested by the code search team at GitHub. Special thanks to the authors of [metrics-rs](https://github.com/metrics-rs/metrics/) and [cadence] libraries. 
 
 [cadence]: https://github.com/56quarters/cadence/
