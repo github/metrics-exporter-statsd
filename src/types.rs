@@ -1,15 +1,4 @@
-use cadence::Metric;
 use metrics::{Key, Label};
-
-pub struct Histogram {
-    repr: String,
-}
-
-impl Metric for Histogram {
-    fn as_metric_str(&self) -> &str {
-        self.repr.as_str()
-    }
-}
 
 /// This enum represents all the different histogram transformations that we support. Each histogram
 /// value also takes tags which should be remaining tags after stripping of the `histogram` label.
