@@ -13,5 +13,5 @@ categories = ["development-tools"]
 
 [dependencies]
 metrics = "0.24"
-cadence = "1.6"
+cadence = "1.8"
 thiserror = "2.0"
